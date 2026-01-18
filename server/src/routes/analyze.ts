@@ -28,18 +28,23 @@ router.post('/', async (req, res) => {
         });
         const isPremium = user?.isPremium ?? false;
 
-        // Get or create usage record for this GitHub account
+        // 1. Ensure usage record exists (handle concurrency)
+        await db
+            .insert(analysisUsage)
+            .values({
+                githubUsername,
+                reposAnalyzed: 0,
+            })
+            .onConflictDoNothing();
+
+        // 2. Fetch the current usage
         let usage = await db.query.analysisUsage.findFirst({
             where: eq(analysisUsage.githubUsername, githubUsername),
         });
 
         if (!usage) {
-            // Create new usage record
-            await db.insert(analysisUsage).values({
-                githubUsername,
-                reposAnalyzed: 0,
-            });
-            usage = { githubUsername, reposAnalyzed: 0, lastAnalyzedAt: new Date() };
+            // Should be impossible after insert
+            throw new Error('Failed to initialize usage record');
         }
 
         // Enforce limit for free tier
