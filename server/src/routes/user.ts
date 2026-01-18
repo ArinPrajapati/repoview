@@ -5,17 +5,17 @@ import { eq } from 'drizzle-orm';
 
 const router = Router();
 
-// GET /api/user?email={email}
+// GET /api/user?username={github_username}
 router.get('/', async (req, res) => {
     try {
-        const { email } = req.query;
+        const { username } = req.query;
 
-        if (!email || typeof email !== 'string') {
-            return res.status(400).json({ error: 'Email is required' });
+        if (!username || typeof username !== 'string') {
+            return res.status(400).json({ error: 'GitHub username is required' });
         }
 
         const user = await db.query.users.findFirst({
-            where: eq(users.email, email.toLowerCase()),
+            where: eq(users.githubUsername, username.toLowerCase()),
         });
 
         if (!user) {

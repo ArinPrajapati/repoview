@@ -6,6 +6,8 @@ import type { GumroadPingPayload } from '../types/index';
 const router = Router();
 
 // POST /api/webhook/gumroad
+// Gumroad sends purchase data here after successful payment
+// GitHub username is passed via url_params (custom field in checkout link)
 router.post('/gumroad', async (req, res) => {
     try {
         const payload = req.body as GumroadPingPayload;
@@ -23,25 +25,36 @@ router.post('/gumroad', async (req, res) => {
             return res.status(200).json({ success: true, message: 'Skipped refunded/disputed' });
         }
 
+        // Get GitHub username from url_params (passed via checkout link)
+        // Expected format: ?github_username=username
+        const githubUsername = payload.url_params?.github_username?.toLowerCase();
+        
+        if (!githubUsername) {
+            console.error('Missing github_username in Gumroad webhook url_params');
+            return res.status(400).json({ error: 'Missing GitHub username' });
+        }
+
         const email = payload.email.toLowerCase();
 
-        // Upsert user as premium
+        // Upsert user as premium (keyed by GitHub username)
         await db
             .insert(users)
             .values({
+                githubUsername,
                 email,
                 isPremium: true,
                 purchaseDate: new Date(payload.sale_timestamp),
             })
             .onConflictDoUpdate({
-                target: users.email,
+                target: users.githubUsername,
                 set: {
+                    email, // Update email if they buy again with different email
                     isPremium: true,
                     purchaseDate: new Date(payload.sale_timestamp),
                 },
             });
 
-        console.log('User marked as premium:', email);
+        console.log('User marked as premium:', githubUsername, email);
 
         // Return 200 to acknowledge receipt
         return res.status(200).json({ success: true });

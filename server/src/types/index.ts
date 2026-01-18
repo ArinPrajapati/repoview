@@ -35,8 +35,9 @@ export interface AnalysisResult {
     suggestions: string[];
 }
 
-// User in database
+// User in database (keyed by GitHub username)
 export interface User {
+    githubUsername: string;
     email: string;
     isPremium: boolean;
     purchaseDate: Date | null;
@@ -55,4 +56,9 @@ export interface GumroadPingPayload {
     refunded: string;
     disputed: string;
     license_key?: string;
+    // Custom fields passed via checkout URL query params
+    url_params?: {
+        github_username?: string;
+        [key: string]: string | undefined;
+    };
 }
