@@ -42,10 +42,38 @@ export default function Results() {
       return;
     }
 
+    // Create a unique cache key for this analysis
+    const cacheKey = `repoview_${username}_${repos.sort().join(',')}`;
+    
+    // Check sessionStorage for cached results
+    const cached = sessionStorage.getItem(cacheKey);
+    if (cached) {
+      try {
+        const { analyses: cachedAnalyses, usage: cachedUsage, timestamp } = JSON.parse(cached);
+        // Use cache if it's less than 1 hour old
+        if (Date.now() - timestamp < 60 * 60 * 1000) {
+          setAnalyses(cachedAnalyses);
+          setUsage(cachedUsage);
+          setLoading(false);
+          return;
+        }
+      } catch {
+        // Invalid cache, continue to fetch
+        sessionStorage.removeItem(cacheKey);
+      }
+    }
+
+    // No valid cache, fetch from API
     analyzeRepos(username, repos)
       .then((data) => {
         setAnalyses(data.analyses);
         setUsage(data.usage);
+        // Cache the results
+        sessionStorage.setItem(cacheKey, JSON.stringify({
+          analyses: data.analyses,
+          usage: data.usage,
+          timestamp: Date.now(),
+        }));
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));

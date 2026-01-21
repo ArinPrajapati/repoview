@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { Octokit } from '@octokit/rest';
 import type { Repository } from '../types/index';
 

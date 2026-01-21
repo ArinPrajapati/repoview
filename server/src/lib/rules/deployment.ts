@@ -22,8 +22,59 @@ const DEMO_KEYWORDS = [
     'check it out', 'hosted', 'production', 'app', 'site',
 ];
 
-export function checkDeployment(readme: string | null): CheckResult[] {
+// Keywords indicating CLI tool, library, or non-web project
+const NON_WEB_INDICATORS = [
+    'cli', 'command-line', 'command line', 'terminal', 'npm install',
+    'go install', 'cargo install', 'pip install', 'brew install',
+    'library', 'package', 'module', 'sdk', 'api client',
+    'utility', 'tool', 'script', 'daemon', 'service',
+];
+
+// File patterns that suggest non-web project
+const NON_WEB_FILES = [
+    'setup.py', 'pyproject.toml', 'cargo.toml', 'go.mod',
+    'makefile', 'cmake', '.gemspec',
+];
+
+/**
+ * Detect if project is a CLI tool, library, or non-web app
+ */
+function isNonWebProject(readme: string | null, files: string[] = []): boolean {
+    if (!readme) return false;
+    
+    const readmeLower = readme.toLowerCase();
+    
+    // Check for CLI/library indicators in README
+    const hasNonWebKeyword = NON_WEB_INDICATORS.some(k => readmeLower.includes(k));
+    
+    // Check for installation commands (strong indicator of CLI/library)
+    const hasInstallCmd = /```[\s\S]*?(npm install|yarn add|pip install|go get|cargo add|brew install)[\s\S]*?```/i.test(readme);
+    
+    // Check for "Usage" section with code blocks (common in libraries)
+    const hasUsageSection = /##\s*usage[\s\S]*?```/i.test(readme);
+    
+    // Check for bin/main entry patterns
+    const hasBinPattern = /"bin":/i.test(readme) || /entry\s*point/i.test(readme);
+    
+    return hasNonWebKeyword || hasInstallCmd || (hasUsageSection && !readmeLower.includes('deploy'));
+}
+
+export function checkDeployment(readme: string | null, files: string[] = []): CheckResult[] {
     const results: CheckResult[] = [];
+
+    // First, check if this is a non-web project
+    if (isNonWebProject(readme, files)) {
+        results.push({
+            checkName: 'Live deployment link',
+            category: 'deployment',
+            passed: true, // Don't penalize
+            points: 20,   // Give full points
+            maxPoints: 20,
+            message: 'Deployment not required for this project type (library/CLI/package)',
+            suggestion: undefined,
+        });
+        return results;
+    }
 
     let hasDeployment = false;
 
@@ -70,3 +121,4 @@ export function checkDeployment(readme: string | null): CheckResult[] {
 
     return results;
 }
+
