@@ -1,5 +1,5 @@
 # Development/Local: Use :80 (HTTP only)
-# Production: Replace with your domain for automatic HTTPS
+# Production: Replace with your domain for automatic HTTPS hi
 :80 {
     # Serve static files
     root * /srv
