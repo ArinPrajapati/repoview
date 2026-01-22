@@ -1,0 +1,68 @@
+version: "3.8"
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: repoview-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-repoview}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-repoview_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-repoview}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-repoview} -d ${POSTGRES_DB:-repoview}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: repoview-server
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-repoview}:${POSTGRES_PASSWORD:-repoview_secret}@postgres:5432/${POSTGRES_DB:-repoview}
+      GITHUB_TOKEN: ${GITHUB_TOKEN}
+      GUMROAD_SELLER_ID: ${GUMROAD_SELLER_ID}
+      PORT: 3001
+      CLIENT_URL: ${CLIENT_URL:-http://localhost}
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Frontend with Caddy
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:3001}
+        VITE_GUMROAD_URL: ${VITE_GUMROAD_URL}
+    container_name: repoview-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - server
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  postgres_data:
+  caddy_data:
+  caddy_config:
