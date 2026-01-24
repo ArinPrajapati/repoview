@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { db } from '../db/index';
 import { users } from '../db/schema';
 import { eq } from 'drizzle-orm';
+import { logger } from '../lib/logger';
 
 const router = Router();
 
@@ -24,7 +25,16 @@ router.get('/', async (req, res) => {
 
         return res.json({ isPremium: user.isPremium });
     } catch (error) {
-        console.error('Error checking user:', error);
+        logger.error(
+            {
+                requestId: req.requestId,
+                userId: typeof req.query?.username === 'string' ? req.query.username.toLowerCase() : undefined,
+                function: 'GET /api/user',
+                params: { username: req.query?.username },
+                error,
+            },
+            'check_user_failed'
+        );
         return res.status(500).json({ error: 'Failed to check user status' });
     }
 });

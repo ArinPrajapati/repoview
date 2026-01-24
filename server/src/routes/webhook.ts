@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { db } from '../db/index';
 import { users } from '../db/schema';
 import type { GumroadPingPayload } from '../types/index';
+import { logger, redactEmail } from '../lib/logger';
 
 const router = Router();
 
@@ -15,13 +16,27 @@ router.post('/gumroad', async (req, res) => {
         // Verify seller_id to prevent spoofed requests
         const expectedSellerId = process.env.GUMROAD_SELLER_ID;
         if (expectedSellerId && payload.seller_id !== expectedSellerId) {
-            console.warn('Invalid seller_id in Gumroad webhook:', payload.seller_id);
+            logger.warn(
+                {
+                    requestId: req.requestId,
+                    function: 'POST /api/webhook/gumroad',
+                    params: { seller_id: payload.seller_id, sale_id: payload.sale_id },
+                },
+                'gumroad_invalid_seller'
+            );
             return res.status(403).json({ error: 'Invalid seller' });
         }
 
         // Check if refunded or disputed
         if (payload.refunded === 'true' || payload.disputed === 'true') {
-            console.log('Skipping refunded/disputed purchase:', payload.sale_id);
+            logger.info(
+                {
+                    requestId: req.requestId,
+                    function: 'POST /api/webhook/gumroad',
+                    params: { sale_id: payload.sale_id, refunded: payload.refunded, disputed: payload.disputed },
+                },
+                'gumroad_skipped_refund_or_dispute'
+            );
             return res.status(200).json({ success: true, message: 'Skipped refunded/disputed' });
         }
 
@@ -30,7 +45,15 @@ router.post('/gumroad', async (req, res) => {
         const githubUsername = payload.url_params?.github_username?.toLowerCase();
         
         if (!githubUsername) {
-            console.error('Missing github_username in Gumroad webhook url_params');
+            logger.error(
+                {
+                    requestId: req.requestId,
+                    function: 'POST /api/webhook/gumroad',
+                    params: { sale_id: payload.sale_id },
+                    error: new Error('Missing github_username in url_params'),
+                },
+                'gumroad_missing_github_username'
+            );
             return res.status(400).json({ error: 'Missing GitHub username' });
         }
 
@@ -54,12 +77,31 @@ router.post('/gumroad', async (req, res) => {
                 },
             });
 
-        console.log('User marked as premium:', githubUsername, email);
+        logger.info(
+            {
+                requestId: req.requestId,
+                userId: githubUsername,
+                function: 'POST /api/webhook/gumroad',
+                params: {
+                    sale_id: payload.sale_id,
+                    product_id: payload.product_id,
+                    email: redactEmail(email),
+                },
+            },
+            'gumroad_user_marked_premium'
+        );
 
         // Return 200 to acknowledge receipt
         return res.status(200).json({ success: true });
     } catch (error) {
-        console.error('Error processing Gumroad webhook:', error);
+        logger.error(
+            {
+                requestId: req.requestId,
+                function: 'POST /api/webhook/gumroad',
+                error,
+            },
+            'gumroad_webhook_failed'
+        );
         // Return 500 so Gumroad retries
         return res.status(500).json({ error: 'Failed to process webhook' });
     }

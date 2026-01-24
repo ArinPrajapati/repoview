@@ -37,22 +37,47 @@
   --animate-float: float 6s ease-in-out infinite;
 
   @keyframes accordion-down {
-    from { height: 0 }
-    to { height: var(--radix-accordion-content-height) }
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
   }
   @keyframes accordion-up {
-    from { height: var(--radix-accordion-content-height) }
-    to { height: 0 }
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
   }
   @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
   }
+  @keyframes gradient-x {
+    0%,
+    100% {
+      background-size: 200% 200%;
+      background-position: left center;
+    }
+    50% {
+      background-size: 200% 200%;
+      background-position: right center;
+    }
+  }
+  --animate-gradient-x: gradient-x 3s ease infinite;
 }
 
 :root {
   /* Default to Dark Mode */
-  --background: oklch(0.129 0.042 264.695);
+  --background: oklch(0.05 0.05 260); /* darker background for premium feel */
   --foreground: oklch(0.984 0.003 247.858);
   --card: oklch(0.129 0.042 264.695);
   --card-foreground: oklch(0.984 0.003 247.858);
@@ -76,7 +101,9 @@
 
 body {
   @apply bg-background text-foreground antialiased selection:bg-blue-500/30 selection:text-blue-200;
-  font-feature-settings: "rlig" 1, "calt" 1;
+  font-feature-settings:
+    "rlig" 1,
+    "calt" 1;
 }
 
 /* Premium Utilities */

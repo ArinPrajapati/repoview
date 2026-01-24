@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { fetchUserRepos } from '../lib/github';
+import { logger } from '../lib/logger';
 
 const router = Router();
 
@@ -19,7 +20,16 @@ router.get('/', async (req, res) => {
             totalCount: repos.length,
         });
     } catch (error) {
-        console.error('Error fetching repos:', error);
+        logger.error(
+            {
+                requestId: req.requestId,
+                userId: typeof req.query?.username === 'string' ? req.query.username.toLowerCase() : undefined,
+                function: 'GET /api/repos',
+                params: { username: req.query?.username },
+                error,
+            },
+            'fetch_repos_failed'
+        );
 
         if (error instanceof Error && error.message.includes('Not Found')) {
             return res.status(404).json({ error: 'GitHub user not found' });

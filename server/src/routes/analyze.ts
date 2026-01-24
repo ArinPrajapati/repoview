@@ -3,6 +3,8 @@ import { eq } from 'drizzle-orm';
 import { analyzeRepository } from '../lib/rules/index';
 import { db } from '../db/index';
 import { users, analysisUsage } from '../db/schema';
+import { logger } from '../lib/logger';
+import { summarizeRepos } from '../lib/requestContext';
 
 const router = Router();
 const FREE_TIER_LIMIT = 3;
@@ -50,7 +52,17 @@ router.post('/', async (req, res) => {
         // Enforce limit for free tier
         if (!isPremium) {
             const remaining = FREE_TIER_LIMIT - usage.reposAnalyzed;
-            console.log('Remaining:', remaining);
+            logger.info(
+                {
+                    requestId: req.requestId,
+                    userId: githubUsername,
+                    function: 'POST /api/analyze',
+                    remaining,
+                    reposRequested: Array.isArray(repos) ? repos.length : undefined,
+                    ...summarizeRepos(repos),
+                },
+                'free_tier_remaining'
+            );
             
             if (remaining <= 0) {
                 return res.status(403).json({
@@ -95,7 +107,19 @@ router.post('/', async (req, res) => {
             },
         });
     } catch (error) {
-        console.error('Error analyzing repos:', error);
+        logger.error(
+            {
+                requestId: req.requestId,
+                userId: typeof req.body?.owner === 'string' ? req.body.owner.toLowerCase() : undefined,
+                function: 'POST /api/analyze',
+                params: {
+                    owner: req.body?.owner,
+                    ...summarizeRepos(req.body?.repos),
+                },
+                error,
+            },
+            'analyze_failed'
+        );
         return res.status(500).json({ error: 'Failed to analyze repositories' });
     }
 });

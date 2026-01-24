@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { generatePdfReport } from '../lib/pdf';
 import type { AnalysisResult } from '../types/index';
+import { logger } from '../lib/logger';
 
 const router = Router();
 
@@ -26,7 +27,19 @@ router.post('/', async (req, res) => {
         res.setHeader('Content-Disposition', `attachment; filename="repoview-${username}.pdf"`);
         return res.send(pdfBuffer);
     } catch (error) {
-        console.error('Error generating PDF:', error);
+        logger.error(
+            {
+                requestId: req.requestId,
+                userId: typeof req.body?.username === 'string' ? req.body.username.toLowerCase() : undefined,
+                function: 'POST /api/pdf',
+                params: {
+                    username: req.body?.username,
+                    analysesCount: Array.isArray(req.body?.analyses) ? req.body.analyses.length : undefined,
+                },
+                error,
+            },
+            'pdf_failed'
+        );
         return res.status(500).json({ error: 'Failed to generate PDF' });
     }
 });
