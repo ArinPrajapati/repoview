@@ -29,8 +29,8 @@ RUN npm ci --omit=dev
 # Copy built files from builder
 COPY --from=builder /app/dist ./dist
 
-# Copy drizzle migrations if they exist
-COPY --from=builder /app/drizzle ./drizzle 2>/dev/null || true
+# Create drizzle directory (migrations will be copied if they exist in builder)
+RUN mkdir -p ./drizzle
 
 EXPOSE 3001
 

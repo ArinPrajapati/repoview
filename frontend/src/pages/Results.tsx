@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -125,8 +124,6 @@ export default function Results() {
       </div>
     );
   }
-
-  const overallScore = Math.round(analyses.reduce((acc, curr) => acc + curr.totalScore, 0) / analyses.length);
 
   return (
     <div className="min-h-screen p-6 md:p-8 pt-12 max-w-6xl mx-auto pb-32">

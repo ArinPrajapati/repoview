@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Search, ArrowRight, ShieldCheck, FileText, BarChart2, Github } from 'lucide-react';
+import { ArrowRight, ShieldCheck, FileText, BarChart2, Github } from 'lucide-react';
 
 export default function Home() {
   const [username, setUsername] = useState('');
