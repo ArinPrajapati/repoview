@@ -29,7 +29,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden bg-[#0a0a0a] text-foreground font-sans selection:bg-blue-500/30 selection:text-blue-100">
-      
+
       {/* Dynamic Background */}
       <div className="fixed inset-0 w-full h-full -z-10 pointer-events-none overflow-hidden">
         <div className="absolute top-[-10%] left-[20%] w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[128px] animate-pulse" style={{ animationDuration: '4s' }} />
@@ -61,49 +61,52 @@ export default function Home() {
       {/* Hero Section */}
       <main className="flex-grow flex flex-col items-center justify-center pt-32 pb-20 px-4 relative z-10">
         <div className="text-center max-w-4xl mx-auto space-y-8 animate-in fade-in zoom-in duration-700 slide-in-from-bottom-4 fill-mode-backwards">
-          
+
           <div className="flex items-center justify-center">
             <Badge variant="outline" className="px-4 py-1.5 rounded-full border-blue-500/30 bg-blue-500/10 text-blue-300 backdrop-blur-sm">
               <Terminal className="w-3.5 h-3.5 mr-2 inline-block" />
               v1.0 • Engineering-Grade Analytics
             </Badge>
           </div>
-          
+
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[1.1] mb-6">
             Upgrade Your <br className="hidden md:block" />
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 animate-gradient-x">
               Github Portfolio
             </span>
           </h1>
-          
+
           <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-light">
             Data-driven insights for your open source work. <br className="hidden md:block" />
             Analyze code patterns, commit history, and architectural quality.
           </p>
 
           {/* Search Input */}
-          <div className="max-w-lg mx-auto mt-12 relative group w-full">
-            <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full opacity-20 group-hover:opacity-40 transition duration-500 blur-xl"></div>
-            <form onSubmit={handleSubmit} className="relative flex items-center bg-zinc-900/80 rounded-full p-2 ring-1 ring-white/10 focus-within:ring-blue-500/50 transition-all shadow-2xl">
-              <div className="pl-5 text-muted-foreground">
-                <Github className="w-5 h-5" />
+          <div className="max-w-xl mx-auto mt-12 relative group w-full">
+            <div className="absolute -inset-[2px] bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full opacity-70 group-hover:opacity-100 blur-sm transition duration-500 animate-gradient-x"></div>
+            <form onSubmit={handleSubmit} className="relative flex items-center bg-[#0a0a0a] rounded-full p-2 ring-1 ring-white/10 focus-within:ring-2 focus-within:ring-purple-500/50 transition-all shadow-2xl">
+              <div className="pl-5 flex items-center gap-2 pointer-events-none select-none text-muted-foreground self-center">
+                <Github className="w-5 h-5 text-white/40" />
+                <span className="text-zinc-500 font-mono text-lg tracking-tight pt-1">github.com/</span>
               </div>
               <Input
                 type="text"
-                placeholder="github_username"
+                autoFocus
+                placeholder="username"
                 value={username}
                 onChange={(e) => {
                   setUsername(e.target.value);
                   setError('');
                 }}
-                className="border-none bg-transparent shadow-none focus-visible:ring-0 text-lg py-7 px-4 placeholder:text-muted-foreground/40 text-white w-full font-mono"
+                className="border-0 border-b-2 border-white/10 focus:border-purple-500 !bg-transparent shadow-none focus-visible:ring-0 text-lg py-2 px-0 placeholder:text-white/20 text-white w-full font-mono tracking-tight h-auto rounded-none caret-purple-500 transition-colors"
+                style={{ paddingBottom: '4px' }}g
               />
-              <Button type="submit" size="icon" className="rounded-full h-12 w-12 bg-white text-black hover:bg-zinc-200 shrink-0 transition-transform active:scale-95">
+              <Button type="submit" size="icon" className="rounded-full h-10 w-10 bg-white text-black hover:bg-zinc-200 shrink-0 transition-transform active:scale-95 absolute right-2">
                 <ArrowRight className="w-5 h-5" />
               </Button>
             </form>
           </div>
-          
+
           {error && (
             <p className="text-red-400 mt-4 text-sm font-medium flex items-center justify-center gap-2 animate-in slide-in-from-top-2">
               <ShieldCheck className="w-4 h-4" /> {error}
@@ -112,18 +115,18 @@ export default function Home() {
 
           {/* Stats / Trust */}
           <div className="pt-8 flex items-center justify-center gap-8 md:gap-16 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
-             <div className="flex flex-col items-center">
-                <span className="font-bold text-white text-xl">100+</span>
-                <span className="text-xs text-muted-foreground uppercase tracking-widest">Rules</span>
-             </div>
-             <div className="flex flex-col items-center">
-                <span className="font-bold text-white text-xl">0ms</span>
-                <span className="text-xs text-muted-foreground uppercase tracking-widest">Latency</span>
-             </div>
-             <div className="flex flex-col items-center">
-                <span className="font-bold text-white text-xl">100%</span>
-                <span className="text-xs text-muted-foreground uppercase tracking-widest">Free</span>
-             </div>
+            <div className="flex flex-col items-center">
+              <span className="font-bold text-white text-xl">100+</span>
+              <span className="text-xs text-muted-foreground uppercase tracking-widest">Rules</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="font-bold text-white text-xl">0ms</span>
+              <span className="text-xs text-muted-foreground uppercase tracking-widest">Latency</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="font-bold text-white text-xl">100%</span>
+              <span className="text-xs text-muted-foreground uppercase tracking-widest">Free</span>
+            </div>
           </div>
         </div>
       </main>
@@ -132,40 +135,46 @@ export default function Home() {
       <section className="py-24 px-4 relative z-10 w-full max-w-7xl mx-auto">
         <h2 className="text-3xl font-bold text-center mb-16 tracking-tight">Technical Deep Dives</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <FeatureCard 
+          <FeatureCard
             icon={<Code2 className="w-6 h-6 text-blue-400" />}
             title="Static Analysis"
             desc="AST-based code parsing to identify anti-patterns, complexity hotspots, and type safety issues."
             color="group-hover:border-blue-500/30"
             bg="group-hover:bg-blue-500/5"
           />
-          <FeatureCard 
+          <FeatureCard
             icon={<Cpu className="w-6 h-6 text-purple-400" />}
             title="Architecture Review"
             desc="Automated evaluation of project structure, separation of concerns, and dependency management."
-             color="group-hover:border-purple-500/30"
-             bg="group-hover:bg-purple-500/5"
+            color="group-hover:border-purple-500/30"
+            bg="group-hover:bg-purple-500/5"
           />
-          <FeatureCard 
+          <FeatureCard
             icon={<FileText className="w-6 h-6 text-pink-400" />}
             title="Automated Reporting"
             desc="Generate PDF technical assessments ready for code reviews or interview discussions."
-             color="group-hover:border-pink-500/30"
-             bg="group-hover:bg-pink-500/5"
+            color="group-hover:border-pink-500/30"
+            bg="group-hover:bg-pink-500/5"
           />
         </div>
       </section>
 
       {/* Footer */}
+      {/* Footer */}
       <footer className="border-t border-white/5 py-12 bg-black/50">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-zinc-500 text-sm">
-            © {new Date().getFullYear()} RepoView. Built for developers.
-          </p>
+          <div className="flex flex-col gap-2">
+            <p className="text-zinc-500 text-sm">
+              © {new Date().getFullYear()} RepoView. Built for developers.
+            </p>
+            <a href="mailto:hi@arinprajapati.com" className="text-zinc-500 hover:text-white transition-colors text-sm">
+              hi@arinprajapati.com
+            </a>
+          </div>
           <div className="flex items-center gap-6">
-             <a href="#" className="text-zinc-500 hover:text-white transition-colors text-sm">Terms</a>
-             <a href="#" className="text-zinc-500 hover:text-white transition-colors text-sm">Privacy</a>
-             <a href="#" className="text-zinc-500 hover:text-white transition-colors text-sm">Twitter</a>
+            <a href="#" className="text-zinc-500 hover:text-white transition-colors text-sm">Terms</a>
+            <a href="#" className="text-zinc-500 hover:text-white transition-colors text-sm">Privacy</a>
+            <a href="mailto:hi@arinprajapati.com" className="text-zinc-500 hover:text-white transition-colors text-sm">Contact</a>
           </div>
         </div>
       </footer>
