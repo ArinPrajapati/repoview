@@ -99,7 +99,7 @@ export default function Home() {
                   setError('');
                 }}
                 className="border-0 border-b-2 border-white/10 focus:border-purple-500 !bg-transparent shadow-none focus-visible:ring-0 text-lg py-2 px-0 placeholder:text-white/20 text-white w-full font-mono tracking-tight h-auto rounded-none caret-purple-500 transition-colors"
-                style={{ paddingBottom: '4px' }}g
+                style={{ paddingBottom: '4px' }}
               />
               <Button type="submit" size="icon" className="rounded-full h-10 w-10 bg-white text-black hover:bg-zinc-200 shrink-0 transition-transform active:scale-95 absolute right-2">
                 <ArrowRight className="w-5 h-5" />
