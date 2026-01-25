@@ -20,6 +20,8 @@ app.use(cors({
   ],
   credentials: true,
 }));
+
+console.log(process.env.CLIENT_URL)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // For Gumroad webhook
 
